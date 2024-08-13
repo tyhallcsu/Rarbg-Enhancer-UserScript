@@ -2,9 +2,9 @@
 var meta = {
     rawmdb: function () {
 // ==UserScript==
-// @name         RARBG Enhancer Fork 6.0.0 (WORKS)
+// @name         RARBG Enhancer Fork 6.0.1 (WORKS)
 // @namespace    https://github.com/tyhallcsu/Rarbg-Enhancer-UserScript
-// @version      6.0.0
+// @version      6.0.1
 // @description  Fork of RARBG Enhancer 6 with updates and fixes. Auto-solve CAPTCHA, infinite scroll, add magnet link shortcuts, thumbnails, image search links, and more!
 // @author       tyhallcsu
 // @contributor  Faris Hijazi (original author)
@@ -72,7 +72,9 @@ var meta = {
 // @include      https://www.proxyrarbg.to/
 // @noframes
 // ==/UserScript==
- && meta.rawmdb.toString && (meta.rawmdb = meta.rawmdb.toString())) {
+    }
+};
+if (meta.rawmdb && meta.rawmdb.toString && (meta.rawmdb = meta.rawmdb.toString())) {
     var kv,
         row = /\/\/\s+@(\S+)\s+(.+)/g;
     while ((kv = row.exec(meta.rawmdb)) !== null) {
