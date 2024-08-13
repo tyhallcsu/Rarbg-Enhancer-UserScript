@@ -2,13 +2,13 @@
 var meta = {
     rawmdb: function () {
 // ==UserScript==
-// @name         RARBG Enhancer
-// @namespace    https://github.com/FarisHijazi
-// @version      1.6.35
-// @description  Auto-solve CAPTCHA, infinite scroll, add a magnet link shortcut and thumbnails of torrents,
-// @description  adds a image search link in case you want to see more pics of the torrent, and more!
-// @author       Faris Hijazi
-//               with some code from https://greasyfork.org/en/users/2160-darkred
+// @name         RARBG Enhancer Fork 6.0.0 (WORKS)
+// @namespace    https://github.com/tyhallcsu/Rarbg-Enhancer-UserScript
+// @version      6.0.0
+// @description  Fork of RARBG Enhancer 6 with updates and fixes. Auto-solve CAPTCHA, infinite scroll, add magnet link shortcuts, thumbnails, image search links, and more!
+// @author       tyhallcsu
+// @contributor  Faris Hijazi (original author)
+// @contributor  darkred (some code from https://greasyfork.org/en/users/2160-darkred)
 // @grant        unsafeWindow
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -17,8 +17,8 @@ var meta = {
 // @grant        GM_registerMenuCommand
 // @icon         https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://rarbg.to&size=16
 // @run-at       document-idle
-// @updateUrl    https://github.com/FarisHijazi/Rarbg-Enhancer-UserScript/raw/master/Rarbg-Enhancer-UserScript.user.js
-// @downloadURL  https://github.com/FarisHijazi/Rarbg-Enhancer-UserScript/raw/master/Rarbg-Enhancer-UserScript.user.js
+// @updateUrl    https://github.com/tyhallcsu/Rarbg-Enhancer-UserScript/raw/master/Rarbg-Enhancer-UserScript.user.js
+// @downloadURL  https://github.com/tyhallcsu/Rarbg-Enhancer-UserScript/raw/master/Rarbg-Enhancer-UserScript.user.js
 // @require      https://code.jquery.com/jquery-3.4.0.min.js
 // @require      https://unpkg.com/infinite-scroll@3.0.5/dist/infinite-scroll.pkgd.min.js
 // @require      https://raw.githubusercontent.com/ccampbell/mousetrap/master/mousetrap.min.js
@@ -66,11 +66,13 @@ var meta = {
 // @include      https://rarbgweb.org
 // @include      https://unblockedrarbg.org
 // @include      https://www.rarbg.is
+// @include      https://www2.rarbggo.to/
+// @include      https://www.rarbgproxy.to/
+// @include      https://www.rarbgo.to/
+// @include      https://www.proxyrarbg.to/
 // @noframes
 // ==/UserScript==
-    }
-};
-if (meta.rawmdb && meta.rawmdb.toString && (meta.rawmdb = meta.rawmdb.toString())) {
+ && meta.rawmdb.toString && (meta.rawmdb = meta.rawmdb.toString())) {
     var kv,
         row = /\/\/\s+@(\S+)\s+(.+)/g;
     while ((kv = row.exec(meta.rawmdb)) !== null) {
@@ -178,7 +180,6 @@ const BLACKLISTED_IMG_URLS = new Set([
     "https://img.trafficimage.club/content/images/system/logo_1575804241329_3ec4e4.png",
     "https://pacific.picturedent.org/images/archive/galaxxxylogo.png",
     "https://worldmkv.com/wp-content/uploads/2017/10/Icon.jpg",
-    "https://torrentgalaxy.to", // not an image
 ]);
 
 const SearchEngines = {
@@ -569,7 +570,7 @@ a.extra-tb {
             // on torrent(s) page
             if (isOnSingleTorrentPage) {
                 let mainTorrentLink = document.querySelector(
-                    "a[onmouseover], body > table:nth-child(6) > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(2) > td > div > table > tbody > tr:nth-child(1) > td > a:nth-child(2)"
+                    "body > table:nth-child(6) > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(2) > td > div > table > tbody > tr:nth-child(1) > td.lista > a:nth-child(2)"
                 );
                 addImageSearchAnchor(mainTorrentLink, mainTorrentLink.innerText);
 
@@ -626,7 +627,6 @@ a.extra-tb {
                 }
 
                 replaceAllImageHosts();
-                replaceAllImageHosts(document.querySelectorAll(".js-modal-url > img"));
 
                 // putting the "Description:" row before the "Others:" row
                 var poster = getElementsByXPath('(//tr[contains(., "Poster:")])[last()]')[0];
@@ -752,7 +752,6 @@ a.extra-tb {
                         if (pageTextsIndex >= 0) {
                             nextPageSelectors = [
                                 ...nextPageSelectors,
-                                `#pager_links > a:nth-child(${pageTextsIndex + 2})`,
                                 `#pager_links > a:nth-child(${pageTextsIndex + 1})`,
                             ];
                         }
@@ -786,6 +785,7 @@ a.extra-tb {
                                 // remove extra appended headers
                                 tbodyEls[0].nextElementSibling.remove();
                             } catch (error) {}
+
                             // filter the new torrents that just arrived
                             updateSearch();
                         });
@@ -1417,12 +1417,7 @@ a.extra-tb {
     }
 
     function dealWithTorrents(node) {
-        for (const torrentLink of node.querySelectorAll(
-            [
-                'tbody tr.lista2 > td > a[title][href^="/torrent/"]:not(.modded)',
-                'tbody tr.table2ta > td > a[title][href^="/torrent/"]:not(.modded)',
-            ].join(",")
-        )) {
+        for (const torrentLink of node.querySelectorAll('tr.lista2 > td > a[title][href^="/torrent/"]:not(.modded)')) {
             const row = torrentLink.closest("tr");
 
             // = adding relative time to columns
@@ -1686,10 +1681,6 @@ a.extra-tb {
 
                             for (const a of doc.querySelectorAll(".js-modal-url")) {
                                 let urls = [];
-                                if (BLACKLISTED_IMG_URLS.has(a.href)) {
-                                    console.warn("Skipping TGX link");
-                                    continue;
-                                }
                                 if (!a.querySelector("img")) {
                                     console.log("a.js-modal-url has no image", a);
 
@@ -1767,7 +1758,7 @@ a.extra-tb {
 
                         // this section of the code should only run on a single image
                         // add rotating gallery for image
-                        img.srcs = Object.entries(Object.fromEntries(descriptionSrcsDescriptionHrefs));
+                        img.srcs = descriptionSrcsDescriptionHrefs;
                         var lastImageIndex = -1; // Store the last displayed image index
 
                         function calculateImageIndex(mouseX) {
@@ -1812,7 +1803,6 @@ a.extra-tb {
                             img.src = src;
                             img.closest("a").href = href;
                             img.style.cursor = ""; // Replace with the path to your cursor image
-                            replaceAllImageHosts([img]);
                         });
 
                         window.addEventListener("keyup", function (event) {
@@ -1893,20 +1883,15 @@ a.extra-tb {
     function downloadAllTorrents() {
         console.log("downloadAllTorrents()");
         const visibleTorrentAnchors = document.querySelectorAll(
-            [
-                'body > table:nth-child(6) > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(1) > td > table.lista2t > tbody > tr.lista2 .torrent-dl:not([style*="display: none;"])',
-                'body > table:nth-child(6) > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(1) > td > table.lista2t > tbody > tr.table2ta .torrent-dl:not([style*="display: none;"])',
-                ".torrent-ml",
-            ].join(",")
+            'body > table:nth-child(6) > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(1) > td > table.lista2t > tbody > tr.lista2 .torrent-dl:not([style*="display: none;"])'
         );
 
         if (confirm(`Would you like to download all the torrents on the page? (${visibleTorrentAnchors.length})`)) {
             // click all magnet links
             // document.querySelectorAll("a.torrent-dl").-forEach(a => window.open(a.click(), '_blank'));
-            document.querySelectorAll("a.torrent-ml").forEach(async function (a) {
+            document.querySelectorAll("a.torrent-ml").forEach((a) => {
                 // invoke the onmouseover event to get the magnet link
                 a.fetchMagnetLink(null, true);
-                await new Promise((resolve) => setTimeout(resolve, 100));
             });
         }
     }
@@ -1999,7 +1984,7 @@ a.extra-tb {
             .call(oldColumnEntries, 1)
             // exclude rows that already have this column
             .filter((oldCol) => {
-                const row = oldCol.closest("tr.lista2, tr.table2ta");
+                const row = oldCol.closest("tr.lista2");
                 const selector = "." + $.escapeSelector(sanitizedTitle);
                 if (row) return !row.querySelector(selector);
             })
@@ -2007,7 +1992,7 @@ a.extra-tb {
 
         // fire callback
         for (let cell of newColumn) {
-            let row = cell.closest("tr.lista2, tr.table2ta");
+            let row = cell.closest("tr.lista2");
             let anchor = row.querySelector("a[title]");
             callback(cell, anchor, row);
         }
@@ -2020,7 +2005,7 @@ a.extra-tb {
      * @return {*}
      */
     function appendColumnCell(prevColCell) {
-        if (prevColCell.closest("tr.lista2, tr.table2ta").querySelector(".has-torrent-DL-ML"))
+        if (prevColCell.closest("tr.lista2").querySelector(".has-torrent-DL-ML"))
             // check that the same row doesn't already have DL-ML
             return;
         // the initial column 'Files' after of which the extra column will be appended
@@ -2045,7 +2030,7 @@ a.extra-tb {
      * @returns {string}
      */
     function addDlAndMl(cell, fileTd) {
-        var row = fileTd.closest("tr.lista2, tr.table2ta");
+        var row = fileTd.closest("tr.lista2");
 
         let anchor = row.querySelector("a[title]");
 
@@ -2421,12 +2406,6 @@ function replaceAllImageHosts(imgs = null) {
         })
     );
     collectedImgs.concat(
-        replaceImageHostImageWithOriginal("/1s/", {
-            "/1s/": "/1/",
-            imgs,
-        })
-    );
-    collectedImgs.concat(
         replaceImageHostImageWithOriginal(".th.jpg", {
             ".th.jpg": ".jpg",
             imgs,
@@ -2448,12 +2427,12 @@ function replaceAllImageHosts(imgs = null) {
         })
     );
 
-    // // remove any image that is from the BLACKLISTED_IMG_URLS
-    // [...document.querySelectorAll("img")].filter((img) => BLACKLISTED_IMG_URLS.has(img.src))
-    //     .forEach((img) => img.remove());
+    // remove any image that is from the BLACKLISTED_IMG_URLS
+    [].filter
+        .call(document.querySelectorAll("img"), (img) => BLACKLISTED_IMG_URLS.has(img.src))
+        .forEach((img) => img.remove());
 
-    proxifyDescriptionThumbnails(imgs);
-    proxifyDescriptionThumbnails(collectedImgs);
+    // proxifyDescriptionThumbnails();
     if (!!imgs && imgs.length) {
         return imgs;
     } else {
