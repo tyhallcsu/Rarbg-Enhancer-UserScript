@@ -411,6 +411,7 @@ const debug = false; // debugmode (setting this to false will disable the consol
         ).length > 0;
 
     const getTorrentLinks = () => Array.from(document.querySelectorAll("table > tbody > tr.lista2 a[title]"));
+    let scheduleInfiniteScrollCheck = () => {};
 
     var row_others = getElementsByXPath('(//tr[contains(., "Others:")])[last()]').pop();
 
@@ -769,6 +770,30 @@ a.extra-tb {
                         };
                         console.log("infinitescroll options:", infscrollOptions);
                         const infScroll = new InfiniteScroll(container, infscrollOptions);
+                        let infiniteScrollCheckTimer;
+                        scheduleInfiniteScrollCheck = function () {
+                            clearTimeout(infiniteScrollCheckTimer);
+                            infiniteScrollCheckTimer = setTimeout(() => {
+                                if (infScroll.isLoading || infScroll.canLoad === false) return;
+
+                                const doc = document.documentElement;
+                                const body = document.body;
+                                const pageHeight = Math.max(
+                                    body.scrollHeight,
+                                    body.offsetHeight,
+                                    doc.clientHeight,
+                                    doc.scrollHeight,
+                                    doc.offsetHeight
+                                );
+                                const distanceFromBottom = pageHeight - (window.pageYOffset + window.innerHeight);
+                                if (distanceFromBottom > infscrollOptions.scrollThreshold) return;
+
+                                console.log(
+                                    "filtered page is near the bottom; requesting another infinite-scroll page"
+                                );
+                                infScroll.loadNextPage();
+                            }, 150);
+                        };
 
                         // upon appending a new page
                         infScroll.on("append", function (response, path, items) {
@@ -1278,6 +1303,7 @@ a.extra-tb {
 
         for (const a of torrents) {
             var match = (a.title || a.innerText).match(regex);
+            let hideCondition = query && !completelyNegativeQuery;
             if (match) {
                 const matches = !!match ? Array.from(match) : [];
                 var negativeMatches = matches.filter(
@@ -1290,16 +1316,19 @@ a.extra-tb {
                         group // tests if it's a negative match (if there is a '-' before the search term)
                     ) => group && !new RegExp("-" + group, "ig").test(query)
                 );
-                const hideCondition =
+                hideCondition =
                     query &&
                     (completelyNegativeQuery
                         ? negativeMatches.length
                         : negativeMatches.length || !positiveMatches.length);
-                a.closest(".lista2").style.display = hideCondition ? "none" : "";
             } // skip if empty title
+
+            a.closest(".lista2").style.display = hideCondition ? "none" : "";
 
             // DONE: make it so that it doesn't just check if "query" starts with '-', rather, check each match and check if each word starts with '-'
         }
+
+        if (query) scheduleInfiniteScrollCheck();
     }
 
     function updateCss() {
