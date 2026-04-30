@@ -3,10 +3,10 @@ var meta = {
     rawmdb: function () {
 // ==UserScript==
 // @name         RARBG Enhancer Fork 6.0.1 (WORKS)
-// @namespace    https://github.com/tyhallcsu/Rarbg-Enhancer-UserScript
+// @namespace    sharmanhall/Rarbg-Enhancer-UserScript
 // @version      6.0.1
 // @description  Fork of RARBG Enhancer 6 with updates and fixes. Auto-solve CAPTCHA, infinite scroll, add magnet link shortcuts, thumbnails, image search links, and more!
-// @author       tyhallcsu
+// @author       sharmanhall
 // @contributor  Faris Hijazi (original author)
 // @contributor  darkred (some code from https://greasyfork.org/en/users/2160-darkred)
 // @grant        unsafeWindow
