@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="RARBG Enhancer UserScript icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#131720"/>
+      <stop offset="100%" stop-color="#222b3f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e74b4b"/>
+      <stop offset="100%" stop-color="#f7b955"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="256" height="256" rx="58" fill="url(#bg)"/>
+  <rect x="15" y="15" width="226" height="226" rx="47" fill="none" stroke="url(#accent)" stroke-width="4"/>
+
+  <g filter="url(#soft-shadow)">
+    <rect x="48" y="59" width="160" height="138" rx="22" fill="#f7f8fb"/>
+    <rect x="48" y="59" width="160" height="36" rx="22" fill="#edf1f7"/>
+    <path d="M48 81c0-12 10-22 22-22h116c12 0 22 10 22 22v14H48V81z" fill="#edf1f7"/>
+    <circle cx="73" cy="78" r="5" fill="#e74b4b"/>
+    <circle cx="92" cy="78" r="5" fill="#f7b955"/>
+    <circle cx="111" cy="78" r="5" fill="#94a3b8"/>
+  </g>
+
+  <rect x="72" y="119" width="112" height="12" rx="6" fill="#d8dee9"/>
+  <rect x="72" y="145" width="72" height="12" rx="6" fill="#d8dee9"/>
+  <rect x="157" y="145" width="27" height="12" rx="6" fill="url(#accent)"/>
+
+  <text x="128" y="218" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="800" font-size="34" fill="#f7f8fb" letter-spacing="1">RE</text>
+</svg>
